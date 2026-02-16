@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEFAULT_MODEL = "gpt-4o"
+DEFAULT_MODEL = "gpt-5-nano"
 
 
 def get_client() -> OpenAI:
