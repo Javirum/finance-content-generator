@@ -2,33 +2,39 @@ from __future__ import annotations
 
 import logging
 import os
+import time
 from datetime import datetime
 from typing import Optional
 
+import openai
 from openai import OpenAI
 from dotenv import load_dotenv
 
+from src.config import DEFAULT_MODEL, PRICING, PODCASTS_DIR
 from src.usage_tracker import record as _record_usage
 
 load_dotenv()
 
-DEFAULT_MODEL = "gpt-5.2"
-
 logger = logging.getLogger(__name__)
 
-# Pricing per 1M tokens (USD) — GPT-5.2, February 2026
-PRICING = {
-    "gpt-5.2": {"input": 1.75, "cached_input": 0.175, "output": 14.00},
-    "gpt-4o-mini-tts": {"input": 0.60, "output": 12.00},
-}
 
+def get_client(api_key: str | None = None) -> OpenAI:
+    """Create and return an OpenAI client.
 
-def get_client() -> OpenAI:
-    """Create and return an OpenAI client."""
-    api_key = os.getenv("OPENAI_API_KEY")
+    Checks for a key in this order: explicit argument → st.secrets → env var.
+    """
+    if not api_key:
+        # Try Streamlit secrets (used on Streamlit Cloud)
+        try:
+            import streamlit as st
+            api_key = st.secrets.get("OPENAI_API_KEY")
+        except Exception:
+            pass
+    if not api_key:
+        api_key = os.getenv("OPENAI_API_KEY")
     if not api_key or api_key == "your-key-here":
         raise RuntimeError(
-            "OPENAI_API_KEY not set. Add your key to the .env file."
+            "OPENAI_API_KEY not set. Add your key to .env, Streamlit secrets, or pass it directly."
         )
     return OpenAI(api_key=api_key)
 
@@ -82,12 +88,26 @@ def generate(client: OpenAI, messages: list[dict], model: str = DEFAULT_MODEL, t
     """Send messages to OpenAI and return the response text."""
     global _last_usage_stats
 
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        temperature=temperature,
-        prompt_cache_retention="24h",
-    )
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=temperature,
+            prompt_cache_retention="24h",
+        )
+    except openai.RateLimitError:
+        logger.warning("Rate limited, retrying in 5s...")
+        time.sleep(5)
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=temperature,
+            prompt_cache_retention="24h",
+        )
+    except openai.APIConnectionError as e:
+        raise RuntimeError(f"Could not connect to OpenAI API: {e}") from e
+    except openai.APIError as e:
+        raise RuntimeError(f"OpenAI API error: {e}") from e
 
     _last_usage_stats = _log_usage(response, model)
     if _last_usage_stats:
@@ -95,8 +115,6 @@ def generate(client: OpenAI, messages: list[dict], model: str = DEFAULT_MODEL, t
 
     return response.choices[0].message.content.strip()
 
-
-PODCASTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "output", "podcasts")
 
 TTS_VOICE_INSTRUCTIONS = (
     "Speak like a podcast host roasting the listener's financial habits. "
@@ -106,21 +124,27 @@ TTS_VOICE_INSTRUCTIONS = (
 
 def generate_speech(client: OpenAI, text: str, topic: str, voice: str = "coral") -> str:
     """Convert *text* to speech using OpenAI TTS and save as MP3. Returns file path."""
-    os.makedirs(PODCASTS_DIR, exist_ok=True)
+    PODCASTS_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     slug = topic.lower().replace(" ", "-")[:30]
-    filepath = os.path.join(PODCASTS_DIR, f"{timestamp}_{slug}.mp3")
+    filepath = PODCASTS_DIR / f"{timestamp}_{slug}.mp3"
 
-    with client.audio.speech.with_streaming_response.create(
-        model="gpt-4o-mini-tts",
-        voice=voice,
-        input=text,
-        instructions=TTS_VOICE_INSTRUCTIONS,
-    ) as response:
-        response.stream_to_file(filepath)
+    try:
+        with client.audio.speech.with_streaming_response.create(
+            model="gpt-4o-mini-tts",
+            voice=voice,
+            input=text,
+            instructions=TTS_VOICE_INSTRUCTIONS,
+        ) as response:
+            response.stream_to_file(str(filepath))
+    except openai.APIConnectionError as e:
+        raise RuntimeError(f"Could not connect to OpenAI API for TTS: {e}") from e
+    except openai.APIError as e:
+        raise RuntimeError(f"OpenAI TTS API error: {e}") from e
+    except OSError as e:
+        raise RuntimeError(f"Failed to write audio file: {e}") from e
 
     # Rough cost estimate for TTS (input text tokens + audio output tokens)
-    # Input: ~1 token per 4 chars; Audio output: ~1 token per char of input text
     input_tokens = len(text) // 4
     audio_output_tokens = len(text)
     prices = PRICING["gpt-4o-mini-tts"]
@@ -137,4 +161,4 @@ def generate_speech(client: OpenAI, text: str, topic: str, voice: str = "coral")
     _record_usage(stats)
     logger.info("TTS generated: %s | Est. cost: $%.4f", filepath, cost)
 
-    return filepath
+    return str(filepath)

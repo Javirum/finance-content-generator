@@ -6,11 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-
-PROMPTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "prompts")
-SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "system_prompt.md")
-DEFAULT_PROMPT_PATH = os.path.join(PROMPTS_DIR, "system_prompt.default.md")
-TEMPLATES_DIR = os.path.join(PROMPTS_DIR, "templates")
+from src.config import PROMPTS_DIR, SYSTEM_PROMPT_PATH, DEFAULT_PROMPT_PATH, TEMPLATES_DIR
 
 
 class PromptManager:
@@ -22,8 +18,8 @@ class PromptManager:
         self._load()
 
     def _ensure_system_prompt_exists(self) -> None:
-        """On first run, copy default → active if active doesn't exist."""
-        if not os.path.exists(SYSTEM_PROMPT_PATH):
+        """On first run, copy default -> active if active doesn't exist."""
+        if not SYSTEM_PROMPT_PATH.exists():
             shutil.copy2(DEFAULT_PROMPT_PATH, SYSTEM_PROMPT_PATH)
 
     def _load(self) -> None:
@@ -46,7 +42,7 @@ class PromptManager:
         """Open the system prompt in the user's default editor."""
         editor = os.environ.get("EDITOR", "nano" if sys.platform != "win32" else "notepad")
         print(f"Opening system prompt in {editor}...")
-        subprocess.run([editor, SYSTEM_PROMPT_PATH])
+        subprocess.run([editor, str(SYSTEM_PROMPT_PATH)])
         self._load()
         print("System prompt updated and reloaded.")
 
@@ -58,7 +54,7 @@ class PromptManager:
 
     def load_template(self, template_name: str) -> str:
         """Load a tweet template by name (e.g. 'tweet_single')."""
-        path = os.path.join(TEMPLATES_DIR, f"{template_name}.md")
+        path = TEMPLATES_DIR / f"{template_name}.md"
         with open(path, "r", encoding="utf-8") as f:
             return f.read().strip()
 

@@ -2,25 +2,41 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
+import tempfile
 from datetime import datetime
 from typing import Optional
 
-USAGE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "output", "usage")
-USAGE_FILE = os.path.join(USAGE_DIR, "usage_log.json")
+from src.config import USAGE_DIR, USAGE_FILE
+
+logger = logging.getLogger(__name__)
 
 
 def _load_log() -> list:
-    if not os.path.exists(USAGE_FILE):
+    if not USAGE_FILE.exists():
         return []
-    with open(USAGE_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(USAGE_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError) as e:
+        logger.warning("Could not read usage log, starting fresh: %s", e)
+        return []
 
 
 def _save_log(entries: list) -> None:
-    os.makedirs(USAGE_DIR, exist_ok=True)
-    with open(USAGE_FILE, "w", encoding="utf-8") as f:
-        json.dump(entries, f, indent=2)
+    USAGE_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        # Atomic write: write to temp file then rename
+        fd, tmp_path = tempfile.mkstemp(dir=USAGE_DIR, suffix=".tmp")
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(entries, f, indent=2)
+        os.replace(tmp_path, USAGE_FILE)
+    except OSError as e:
+        logger.warning("Failed to save usage log: %s", e)
+        # Clean up temp file if rename failed
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
 
 
 def record(stats: dict) -> None:

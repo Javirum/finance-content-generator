@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """MoneySavvy AI — Gen Z Financial Coach Content Engine"""
 
-import os
 import shlex
 
+from src.config import KB_DIR
 from src.llm_client import get_client
 from src.knowledge_base import KnowledgeBase
 from src.prompts import PromptManager
 from src.generator import generate_tweet, generate_thread, save_output
-
-KB_DIR = os.path.join(os.path.dirname(__file__), "knowledge_base")
 
 HELP_TEXT = """
 Available commands:
@@ -58,7 +56,7 @@ def main():
         return
 
     # Load knowledge base
-    kb = KnowledgeBase(KB_DIR, openai_client=client)
+    kb = KnowledgeBase(str(KB_DIR), openai_client=client)
     print("Loading knowledge base...")
     kb.load_all()
     kb.display()

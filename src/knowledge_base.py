@@ -1,7 +1,12 @@
+from __future__ import annotations
+
+import logging
 import os
 from pathlib import Path
 
 from src.file_processor import detect_format, extract_text
+
+logger = logging.getLogger(__name__)
 
 
 class KBEntry:
@@ -26,7 +31,7 @@ class KnowledgeBase:
 
     def __init__(self, kb_dir: str, openai_client=None):
         self._entries: list[KBEntry] = []
-        self._kb_dir = kb_dir
+        self._kb_dir = str(kb_dir)
         self._openai_client = openai_client
 
     def load_all(self) -> None:
@@ -38,25 +43,33 @@ class KnowledgeBase:
             for filename in sorted(os.listdir(dir_path)):
                 filepath = os.path.join(dir_path, filename)
                 if os.path.isfile(filepath):
-                    self._load_file(filepath)
+                    entry = self._load_file(filepath)
+                    if entry is not None:
+                        self._entries.append(entry)
 
-    def _load_file(self, source: str) -> KBEntry:
-        fmt = detect_format(source)
-        if fmt == "AUDIO":
-            print(f"  Transcribing {os.path.basename(source)} via Whisper API...")
-        if fmt == "YOUTUBE":
-            print(f"  Fetching YouTube transcript...")
-        content = extract_text(source, self._openai_client)
-        entry = KBEntry(source=source, fmt=fmt, content=content)
-        self._entries.append(entry)
-        return entry
+    def _load_file(self, source: str) -> KBEntry | None:
+        try:
+            fmt = detect_format(source)
+            if fmt == "AUDIO":
+                print(f"  Transcribing {os.path.basename(source)} via Whisper API...")
+            if fmt == "YOUTUBE":
+                print(f"  Fetching YouTube transcript...")
+            content = extract_text(source, self._openai_client)
+            return KBEntry(source=source, fmt=fmt, content=content)
+        except Exception as e:
+            logger.warning("Failed to load %s: %s", source, e)
+            return None
 
     def add(self, source: str) -> KBEntry:
         """Add a new file or URL to the knowledge base."""
         fmt = detect_format(source)
         if fmt == "UNKNOWN":
             raise ValueError(f"Unsupported format: {source}")
-        return self._load_file(source)
+        entry = self._load_file(source)
+        if entry is None:
+            raise ValueError(f"Failed to load: {source}")
+        self._entries.append(entry)
+        return entry
 
     def remove(self, index: int) -> KBEntry:
         """Remove a file by its 1-based index."""

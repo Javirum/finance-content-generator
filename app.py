@@ -4,42 +4,56 @@ import os
 
 import streamlit as st
 
+from src.config import KB_DIR, OUTPUT_DIR
 from src.llm_client import get_client, get_last_usage_stats, generate_speech
 from src.knowledge_base import KnowledgeBase
 from src.prompts import PromptManager
-from src.generator import generate_daily_content, generate_podcast_script, save_output, OUTPUT_DIR
+from src.generator import generate_daily_content, generate_podcast_script, save_output
 from src.usage_tracker import get_monthly_summary
-
-KB_DIR = os.path.join(os.path.dirname(__file__), "knowledge_base")
 
 WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 
+# ── Page config ─────────────────────────────────────────────────────────────
+
+st.set_page_config(page_title="MoneySavvy AI", page_icon="💰", layout="wide")
+
+
 # ── Initialise session state ────────────────────────────────────────────────
 
-def init_state():
+def init_state() -> bool:
+    """Return True when the app is ready (API key is set)."""
     if "client" not in st.session_state:
-        st.session_state.client = get_client()
+        try:
+            st.session_state.client = get_client()
+        except RuntimeError:
+            return False
     if "kb" not in st.session_state:
-        kb = KnowledgeBase(KB_DIR, openai_client=st.session_state.client)
+        kb = KnowledgeBase(str(KB_DIR), openai_client=st.session_state.client)
         kb.load_all()
         st.session_state.kb = kb
     if "prompt_mgr" not in st.session_state:
         st.session_state.prompt_mgr = PromptManager()
     if "generated_content" not in st.session_state:
         st.session_state.generated_content = ""
+    return True
 
 
-init_state()
+if not init_state():
+    st.title("💰 MoneySavvy AI")
+    st.warning("OpenAI API key not found. Enter your key below to get started.")
+    key = st.text_input("OpenAI API Key", type="password", placeholder="sk-...")
+    if key:
+        try:
+            st.session_state.client = get_client(api_key=key)
+            st.rerun()
+        except RuntimeError as e:
+            st.error(str(e))
+    st.stop()
 
 kb: KnowledgeBase = st.session_state.kb
 client = st.session_state.client
 prompt_mgr: PromptManager = st.session_state.prompt_mgr
-
-
-# ── Page config ─────────────────────────────────────────────────────────────
-
-st.set_page_config(page_title="MoneySavvy AI", page_icon="💰", layout="wide")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -56,9 +70,12 @@ weekday = col_day.selectbox("Day", WEEKDAYS)
 
 if st.button("Generate", type="primary", disabled=not topic):
     with st.spinner("Generating..."):
-        result = generate_daily_content(client, kb, prompt_mgr, topic, weekday)
-        st.session_state.generated_content = result
-        st.session_state.usage_stats = get_last_usage_stats()
+        try:
+            result = generate_daily_content(client, kb, prompt_mgr, topic, weekday)
+            st.session_state.generated_content = result
+            st.session_state.usage_stats = get_last_usage_stats()
+        except RuntimeError as e:
+            st.error(f"Generation failed: {e}")
 
 # ── Output display ──────────────────────────────────────────────────────────
 
@@ -79,16 +96,22 @@ if content:
 
     col_save_btn, col_podcast_btn = st.columns(2)
     if col_save_btn.button("Save to file"):
-        path = save_output(content, topic)
-        st.success(f"Saved → {os.path.relpath(path)}")
+        try:
+            path = save_output(content, topic)
+            st.success(f"Saved → {os.path.relpath(path)}")
+        except RuntimeError as e:
+            st.error(f"Failed to save: {e}")
 
     if col_podcast_btn.button("🎙️ Generate Audio Pill", type="secondary"):
-        with st.spinner("Writing podcast script..."):
-            script = generate_podcast_script(client, kb, prompt_mgr, topic, content)
-            st.session_state.podcast_script = script
-        with st.spinner("Generating audio..."):
-            audio_path = generate_speech(client, script, topic)
-            st.session_state.podcast_audio_path = audio_path
+        try:
+            with st.spinner("Writing podcast script..."):
+                script = generate_podcast_script(client, kb, prompt_mgr, topic, content)
+                st.session_state.podcast_script = script
+            with st.spinner("Generating audio..."):
+                audio_path = generate_speech(client, script, topic)
+                st.session_state.podcast_audio_path = audio_path
+        except RuntimeError as e:
+            st.error(f"Podcast generation failed: {e}")
 
     # ── Podcast output ───────────────────────────────────────────────────
     if st.session_state.get("podcast_audio_path"):
@@ -125,11 +148,11 @@ m5.metric("Total cost", "${:.4f}".format(monthly["total_cost_usd"]))
 st.divider()
 
 with st.expander("📜 History (saved outputs)"):
-    if os.path.isdir(OUTPUT_DIR):
+    if OUTPUT_DIR.is_dir():
         files = sorted(os.listdir(OUTPUT_DIR), reverse=True)
         if files:
             for fname in files:
-                fpath = os.path.join(OUTPUT_DIR, fname)
+                fpath = OUTPUT_DIR / fname
                 with open(fpath, "r", encoding="utf-8") as f:
                     st.markdown(f"**{fname}**")
                     st.code(f.read())

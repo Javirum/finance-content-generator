@@ -1,15 +1,10 @@
 import os
 from datetime import datetime
 
+from src.config import OUTPUT_DIR, BRAND_GUIDELINES_PATH
 from src.knowledge_base import KnowledgeBase
 from src.prompts import PromptManager
 from src.llm_client import generate as llm_generate
-
-OUTPUT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "output", "generated")
-BRAND_GUIDELINES_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)),
-    "knowledge_base", "primary", "brand-guidelines.md",
-)
 
 
 def generate_tweet(client, kb: KnowledgeBase, prompt_mgr: PromptManager, topic: str, style: str = "educational") -> str:
@@ -54,8 +49,13 @@ def generate_thread(client, kb: KnowledgeBase, prompt_mgr: PromptManager, topic:
 
 def generate_daily_content(client, kb: KnowledgeBase, prompt_mgr: PromptManager, topic: str, weekday: str) -> str:
     """Generate all 3 tweets for a given weekday using the brand guidelines."""
-    with open(BRAND_GUIDELINES_PATH, "r", encoding="utf-8") as f:
-        brand_guidelines = f.read().strip()
+    try:
+        with open(BRAND_GUIDELINES_PATH, "r", encoding="utf-8") as f:
+            brand_guidelines = f.read().strip()
+    except FileNotFoundError:
+        raise RuntimeError(
+            f"Brand guidelines file not found at: {BRAND_GUIDELINES_PATH}"
+        ) from None
 
     kb_context = kb.get_context()
     messages = prompt_mgr.build_messages(
@@ -93,11 +93,14 @@ def generate_podcast_script(client, kb: KnowledgeBase, prompt_mgr: PromptManager
 
 def save_output(content: str, topic: str) -> str:
     """Save generated content to output/generated/ with a timestamp. Returns the file path."""
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    slug = topic.lower().replace(" ", "-")[:30]
-    filename = f"{timestamp}_{slug}.md"
-    filepath = os.path.join(OUTPUT_DIR, filename)
-    with open(filepath, "w", encoding="utf-8") as f:
-        f.write(f"# Topic: {topic}\n\n{content}\n")
-    return filepath
+    try:
+        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        slug = topic.lower().replace(" ", "-")[:30]
+        filename = f"{timestamp}_{slug}.md"
+        filepath = OUTPUT_DIR / filename
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(f"# Topic: {topic}\n\n{content}\n")
+    except OSError as e:
+        raise RuntimeError(f"Failed to save output file: {e}") from e
+    return str(filepath)

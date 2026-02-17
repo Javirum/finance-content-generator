@@ -44,7 +44,7 @@ def extract_text(source: str, openai_client=None) -> str:
         The extracted text content.
 
     Raises:
-        ValueError: If the format is unsupported or a required dependency is missing.
+        ValueError: If the format is unsupported or extraction fails.
     """
     fmt = detect_format(source)
 
@@ -63,38 +63,57 @@ def extract_text(source: str, openai_client=None) -> str:
 
 
 def _read_text_file(path: str) -> str:
-    with open(path, "r", encoding="utf-8") as f:
-        return f.read()
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read()
+    except OSError as e:
+        raise ValueError(f"Could not read text file {path}: {e}") from e
+    except UnicodeDecodeError as e:
+        raise ValueError(f"Encoding error reading {path}: {e}") from e
 
 
 def _read_pdf(path: str) -> str:
-    reader = PdfReader(path)
-    pages = [page.extract_text() or "" for page in reader.pages]
-    return "\n\n".join(pages).strip()
+    try:
+        reader = PdfReader(path)
+        pages = [page.extract_text() or "" for page in reader.pages]
+        return "\n\n".join(pages).strip()
+    except Exception as e:
+        raise ValueError(f"Could not read PDF {path}: {e}") from e
 
 
 def _read_docx(path: str) -> str:
-    doc = Document(path)
-    return "\n\n".join(p.text for p in doc.paragraphs if p.text.strip())
+    try:
+        doc = Document(path)
+        return "\n\n".join(p.text for p in doc.paragraphs if p.text.strip())
+    except Exception as e:
+        raise ValueError(f"Could not read DOCX {path}: {e}") from e
 
 
 def _transcribe_audio(path: str, openai_client) -> str:
     if openai_client is None:
         raise ValueError("OpenAI client is required for audio transcription.")
-    with open(path, "rb") as audio_file:
-        transcription = openai_client.audio.transcriptions.create(
-            model="whisper-1",
-            file=audio_file,
-        )
-    return transcription.text
+    try:
+        with open(path, "rb") as audio_file:
+            transcription = openai_client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_file,
+            )
+        return transcription.text
+    except Exception as e:
+        raise ValueError(f"Audio transcription failed for {path}: {e}") from e
 
 
 def _fetch_youtube_transcript(url: str) -> str:
-    from youtube_transcript_api import YouTubeTranscriptApi
+    try:
+        from youtube_transcript_api import YouTubeTranscriptApi
 
-    video_id_match = re.search(r"(?:v=|youtu\.be/)([\w-]+)", url)
-    if not video_id_match:
-        raise ValueError(f"Could not extract video ID from URL: {url}")
-    video_id = video_id_match.group(1)
-    transcript = YouTubeTranscriptApi.get_transcript(video_id)
-    return " ".join(entry["text"] for entry in transcript)
+        video_id_match = re.search(r"(?:v=|youtu\.be/)([\w-]+)", url)
+        if not video_id_match:
+            raise ValueError(f"Could not extract video ID from URL: {url}")
+        video_id = video_id_match.group(1)
+        transcript = YouTubeTranscriptApi.get_transcript(video_id)
+        return " ".join(entry["text"] for entry in transcript)
+    except ValueError:
+        raise
+    except Exception as e:
+        raise ValueError(f"Failed to fetch YouTube transcript for {url}: {e}") from e
