@@ -27,8 +27,8 @@ def get_client(api_key: str | None = None) -> OpenAI:
         # Try Streamlit secrets (used on Streamlit Cloud)
         try:
             import streamlit as st
-            api_key = st.secrets.get("OPENAI_API_KEY")
-        except Exception:
+            api_key = st.secrets["OPENAI_API_KEY"]
+        except (KeyError, FileNotFoundError, Exception):
             pass
     if not api_key:
         api_key = os.getenv("OPENAI_API_KEY")
