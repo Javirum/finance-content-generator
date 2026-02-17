@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
+from datetime import datetime
 from typing import Optional
 
 from openai import OpenAI
@@ -18,6 +19,7 @@ logger = logging.getLogger(__name__)
 # Pricing per 1M tokens (USD) — GPT-5.2, February 2026
 PRICING = {
     "gpt-5.2": {"input": 1.75, "cached_input": 0.175, "output": 14.00},
+    "gpt-4o-mini-tts": {"input": 0.60, "output": 12.00},
 }
 
 
@@ -92,3 +94,47 @@ def generate(client: OpenAI, messages: list[dict], model: str = DEFAULT_MODEL, t
         _record_usage(_last_usage_stats)
 
     return response.choices[0].message.content.strip()
+
+
+PODCASTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "output", "podcasts")
+
+TTS_VOICE_INSTRUCTIONS = (
+    "Speak like a podcast host roasting the listener's financial habits. "
+    "Energetic, funny, slightly sarcastic."
+)
+
+
+def generate_speech(client: OpenAI, text: str, topic: str, voice: str = "coral") -> str:
+    """Convert *text* to speech using OpenAI TTS and save as MP3. Returns file path."""
+    os.makedirs(PODCASTS_DIR, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    slug = topic.lower().replace(" ", "-")[:30]
+    filepath = os.path.join(PODCASTS_DIR, f"{timestamp}_{slug}.mp3")
+
+    with client.audio.speech.with_streaming_response.create(
+        model="gpt-4o-mini-tts",
+        voice=voice,
+        input=text,
+        instructions=TTS_VOICE_INSTRUCTIONS,
+    ) as response:
+        response.stream_to_file(filepath)
+
+    # Rough cost estimate for TTS (input text tokens + audio output tokens)
+    # Input: ~1 token per 4 chars; Audio output: ~1 token per char of input text
+    input_tokens = len(text) // 4
+    audio_output_tokens = len(text)
+    prices = PRICING["gpt-4o-mini-tts"]
+    cost = (input_tokens / 1_000_000) * prices["input"] + (audio_output_tokens / 1_000_000) * prices["output"]
+
+    stats = {
+        "input_tokens": input_tokens,
+        "cached_tokens": 0,
+        "uncached_tokens": input_tokens,
+        "output_tokens": audio_output_tokens,
+        "cache_hit_pct": 0,
+        "cost_usd": cost,
+    }
+    _record_usage(stats)
+    logger.info("TTS generated: %s | Est. cost: $%.4f", filepath, cost)
+
+    return filepath

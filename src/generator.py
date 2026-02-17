@@ -67,6 +67,30 @@ def generate_daily_content(client, kb: KnowledgeBase, prompt_mgr: PromptManager,
     return llm_generate(client, messages)
 
 
+def generate_podcast_script(client, kb: KnowledgeBase, prompt_mgr: PromptManager, topic: str, tweets: str) -> str:
+    """Generate a ~1 minute podcast script using the tweets as context."""
+    kb_context = kb.get_context()
+
+    user_content = ""
+    if kb_context:
+        user_content += f"## Knowledge Base Context\n\n{kb_context}\n\n---\n\n"
+
+    user_content += (
+        "## Request\n\n"
+        "Write a 1-minute financial roast podcast script (~150 words) using the tweets below as guidelines.\n"
+        "Tone: humorous, roast-style, Gen Z voice, but educational underneath.\n"
+        "Do NOT include stage directions, sound effects, or speaker labels — just the spoken monologue.\n\n"
+        f"### Topic: {topic}\n\n"
+        f"### Tweets\n\n{tweets}\n"
+    )
+
+    messages = [
+        {"role": "system", "content": prompt_mgr.system_prompt},
+        {"role": "user", "content": user_content},
+    ]
+    return llm_generate(client, messages)
+
+
 def save_output(content: str, topic: str) -> str:
     """Save generated content to output/generated/ with a timestamp. Returns the file path."""
     os.makedirs(OUTPUT_DIR, exist_ok=True)
