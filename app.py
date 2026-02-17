@@ -1,16 +1,18 @@
-"""LazyInvest — Streamlit Web UI for the finance content generator."""
+"""MoneySavy AI — Streamlit Web UI for the finance content generator."""
 
 import os
-import tempfile
 
 import streamlit as st
 
-from src.llm_client import get_client
+from src.llm_client import get_client, get_last_usage_stats
 from src.knowledge_base import KnowledgeBase
-from src.prompts import PromptManager, SYSTEM_PROMPT_PATH
-from src.generator import generate_tweet, generate_thread, save_output, OUTPUT_DIR
+from src.prompts import PromptManager
+from src.generator import generate_daily_content, save_output, OUTPUT_DIR
+from src.usage_tracker import get_monthly_summary
 
 KB_DIR = os.path.join(os.path.dirname(__file__), "knowledge_base")
+
+WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 
 # ── Initialise session state ────────────────────────────────────────────────
@@ -37,103 +39,26 @@ prompt_mgr: PromptManager = st.session_state.prompt_mgr
 
 # ── Page config ─────────────────────────────────────────────────────────────
 
-st.set_page_config(page_title="LazyInvest", page_icon="💰", layout="wide")
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# SIDEBAR
-# ══════════════════════════════════════════════════════════════════════════════
-
-with st.sidebar:
-    st.title("💰 LazyInvest")
-
-    # ── Knowledge Base ──────────────────────────────────────────────────────
-
-    st.header("📂 Knowledge Base")
-
-    entries = kb.list_entries()
-    total_kb = sum(e.size_kb for e in entries)
-    st.caption(f"{len(entries)} file{'s' if len(entries) != 1 else ''} · {total_kb:.1f} KB")
-
-    for idx, entry in enumerate(entries, 1):
-        col_name, col_btn = st.columns([4, 1])
-        col_name.text(f"{entry.name} ({entry.fmt})")
-        if col_btn.button("✕", key=f"rm_{idx}"):
-            kb.remove(idx)
-            st.rerun()
-
-    # Upload files
-    uploaded = st.file_uploader(
-        "Upload files",
-        accept_multiple_files=True,
-        type=["md", "txt", "pdf", "docx", "mp3", "wav", "m4a", "ogg"],
-    )
-    if uploaded:
-        for f in uploaded:
-            tmp = tempfile.NamedTemporaryFile(delete=False, suffix=f"_{f.name}")
-            tmp.write(f.read())
-            tmp.close()
-            try:
-                kb.add(tmp.name)
-            except Exception as e:
-                st.error(f"Error adding {f.name}: {e}")
-            finally:
-                os.unlink(tmp.name)
-        st.rerun()
-
-    # YouTube URL
-    yt_url = st.text_input("YouTube URL")
-    if st.button("Add YouTube") and yt_url:
-        try:
-            kb.add(yt_url)
-            st.rerun()
-        except Exception as e:
-            st.error(f"Error: {e}")
-
-    st.divider()
-
-    # ── System Prompt ───────────────────────────────────────────────────────
-
-    st.header("📝 System Prompt")
-
-    edited_prompt = st.text_area(
-        "Edit system prompt",
-        value=prompt_mgr.system_prompt,
-        height=200,
-        label_visibility="collapsed",
-    )
-
-    col_save, col_reset = st.columns(2)
-    if col_save.button("Save Prompt"):
-        with open(SYSTEM_PROMPT_PATH, "w", encoding="utf-8") as f:
-            f.write(edited_prompt)
-        prompt_mgr._load()
-        st.success("Saved!")
-
-    if col_reset.button("Reset to Default"):
-        prompt_mgr.reset()
-        st.rerun()
+st.set_page_config(page_title="MoneySavy AI", page_icon="💰", layout="wide")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # MAIN AREA
 # ══════════════════════════════════════════════════════════════════════════════
 
+st.title("💰 MoneySavy AI")
 st.header("🐦 Content Generator")
 
-col_topic, col_style, col_count = st.columns([3, 2, 2])
+col_topic, col_day = st.columns([3, 2])
 
 topic = col_topic.text_input("Topic", placeholder="e.g. first paycheck tips")
-style = col_style.selectbox("Style", ["educational", "motivational", "myth-busting"])
-tweet_count = col_count.slider("Number of tweets", min_value=1, max_value=5, value=1)
+weekday = col_day.selectbox("Day", WEEKDAYS)
 
 if st.button("Generate", type="primary", disabled=not topic):
     with st.spinner("Generating..."):
-        if tweet_count == 1:
-            result = generate_tweet(client, kb, prompt_mgr, topic, style)
-        else:
-            result = generate_thread(client, kb, prompt_mgr, topic, style, count=tweet_count)
+        result = generate_daily_content(client, kb, prompt_mgr, topic, weekday)
         st.session_state.generated_content = result
+        st.session_state.usage_stats = get_last_usage_stats()
 
 # ── Output display ──────────────────────────────────────────────────────────
 
@@ -142,15 +67,34 @@ if content:
     st.subheader("Output")
     st.markdown(f"```\n{content}\n```")
 
-    if tweet_count == 1:
-        length = len(content)
-        color = "green" if length <= 280 else "red"
-        st.markdown(f":{color}[{length} / 280 characters]")
+    # ── Usage stats ──────────────────────────────────────────────────────
+    stats = st.session_state.get("usage_stats")
+    if stats:
+        with st.expander("Token usage & cost"):
+            c1, c2, c3, c4 = st.columns(4)
+            c1.metric("Input tokens", f"{stats['input_tokens']:,}")
+            c2.metric("Cached", f"{stats['cached_tokens']:,}")
+            c3.metric("Cache hit", f"{stats['cache_hit_pct']:.0f}%")
+            c4.metric("Cost", f"${stats['cost_usd']:.4f}")
 
     col_copy, col_save_btn = st.columns(2)
     if col_save_btn.button("Save to file"):
         path = save_output(content, topic)
         st.success(f"Saved → {os.path.relpath(path)}")
+
+# ── Monthly usage ──────────────────────────────────────────────────────
+
+st.divider()
+
+monthly = get_monthly_summary()
+st.subheader("Monthly Usage ({})".format(monthly["month"]))
+
+m1, m2, m3, m4, m5 = st.columns(5)
+m1.metric("Requests", monthly["requests"])
+m2.metric("Input tokens", "{:,}".format(monthly["input_tokens"]))
+m3.metric("Output tokens", "{:,}".format(monthly["output_tokens"]))
+m4.metric("Avg cache hit", "{:.0f}%".format(monthly["avg_cache_hit_pct"]))
+m5.metric("Total cost", "${:.4f}".format(monthly["total_cost_usd"]))
 
 # ── History ─────────────────────────────────────────────────────────────────
 
