@@ -1,4 +1,4 @@
-# MoneySavy AI — Cost Analysis Report
+# MoneySavvy AI — Cost Analysis Report
 
 > **API-powered content generation vs ChatGPT Plus & Pro subscriptions**
 >
@@ -24,7 +24,7 @@ Every call to `generate_daily_content` sends the following payload:
 
 If a tweet exceeds 280 chars and triggers a **retry**, the conversation grows by ~200 tokens (assistant reply + correction prompt), but this is rare for `generate_daily_content`.
 
----
+--- 
 
 ## 2. GPT-5.2 API Pricing
 
@@ -74,7 +74,7 @@ The app generates **3 tweets/day, 7 days/week** = **~90 requests/month** (one re
 
 ## 5. Comparison: API vs ChatGPT Plus vs ChatGPT Pro
 
-| Criteria                     | MoneySavy AI (API)               | ChatGPT Plus                      | ChatGPT Pro                        |
+| Criteria                     | MoneySavvy AI (API)               | ChatGPT Plus                      | ChatGPT Pro                        |
 | ---------------------------- | -------------------------------- | --------------------------------- | ---------------------------------- |
 | **Monthly cost**             | **$0.26 – $12.00**              | **$20/month (fixed)**             | **$200/month (fixed)**             |
 | **Model access**             | GPT-5.2                          | GPT-5.2 Thinking + legacy models  | GPT-5.2 Pro + all models           |

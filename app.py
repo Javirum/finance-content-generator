@@ -1,13 +1,13 @@
-"""MoneySavy AI — Streamlit Web UI for the finance content generator."""
+"""MoneySavvy AI — Streamlit Web UI for the finance content generator."""
 
 import os
 
 import streamlit as st
 
-from src.llm_client import get_client, get_last_usage_stats
+from src.llm_client import get_client, get_last_usage_stats, generate_speech
 from src.knowledge_base import KnowledgeBase
 from src.prompts import PromptManager
-from src.generator import generate_daily_content, save_output, OUTPUT_DIR
+from src.generator import generate_daily_content, generate_podcast_script, save_output, OUTPUT_DIR
 from src.usage_tracker import get_monthly_summary
 
 KB_DIR = os.path.join(os.path.dirname(__file__), "knowledge_base")
@@ -39,14 +39,14 @@ prompt_mgr: PromptManager = st.session_state.prompt_mgr
 
 # ── Page config ─────────────────────────────────────────────────────────────
 
-st.set_page_config(page_title="MoneySavy AI", page_icon="💰", layout="wide")
+st.set_page_config(page_title="MoneySavvy AI", page_icon="💰", layout="wide")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # MAIN AREA
 # ══════════════════════════════════════════════════════════════════════════════
 
-st.title("💰 MoneySavy AI")
+st.title("💰 MoneySavvy AI")
 st.header("🐦 Content Generator")
 
 col_topic, col_day = st.columns([3, 2])
@@ -65,7 +65,7 @@ if st.button("Generate", type="primary", disabled=not topic):
 content = st.session_state.generated_content
 if content:
     st.subheader("Output")
-    st.markdown(f"```\n{content}\n```")
+    st.text_area("Generated content", content, height=300, disabled=False, label_visibility="collapsed")
 
     # ── Usage stats ──────────────────────────────────────────────────────
     stats = st.session_state.get("usage_stats")
@@ -77,10 +77,34 @@ if content:
             c3.metric("Cache hit", f"{stats['cache_hit_pct']:.0f}%")
             c4.metric("Cost", f"${stats['cost_usd']:.4f}")
 
-    col_copy, col_save_btn = st.columns(2)
+    col_save_btn, col_podcast_btn = st.columns(2)
     if col_save_btn.button("Save to file"):
         path = save_output(content, topic)
         st.success(f"Saved → {os.path.relpath(path)}")
+
+    if col_podcast_btn.button("🎙️ Generate Audio Pill", type="secondary"):
+        with st.spinner("Writing podcast script..."):
+            script = generate_podcast_script(client, kb, prompt_mgr, topic, content)
+            st.session_state.podcast_script = script
+        with st.spinner("Generating audio..."):
+            audio_path = generate_speech(client, script, topic)
+            st.session_state.podcast_audio_path = audio_path
+
+    # ── Podcast output ───────────────────────────────────────────────────
+    if st.session_state.get("podcast_audio_path"):
+        st.subheader("🎙️ Podcast")
+        audio_path = st.session_state.podcast_audio_path
+        with open(audio_path, "rb") as audio_file:
+            audio_bytes = audio_file.read()
+        st.audio(audio_bytes, format="audio/mp3")
+        st.download_button(
+            label="Download MP3",
+            data=audio_bytes,
+            file_name=os.path.basename(audio_path),
+            mime="audio/mpeg",
+        )
+        with st.expander("📝 Podcast script"):
+            st.markdown(st.session_state.get("podcast_script", ""))
 
 # ── Monthly usage ──────────────────────────────────────────────────────
 

@@ -1,147 +1,299 @@
-# LazyInvest — Brand Architecture & Content Strategy
+# MoneySavvy AI — Brand Architecture & Content Strategy
 
-**Platform:** X  
-**Target Audience:** Gen Z (17–23), Europe-based  
-**Goal:** Education → Trust → Retention → Referral  
+**Platform:** X
+**Target Audience:** Gen Z (17–23), Europe-based
+**Goal:** Education → Trust → Retention → Referral
 
 ---
 
 ## 1. Posting Schedule & Tweet Structure
 
-LazyInvest posts **3 tweets per day, Monday–Friday**, with a clear structure:
+MoneySavvy AI posts **3 tweets per day, Monday–Sunday**, with a clear structure:
 
-| Tweet | Purpose | Length Format | Frequency | Pillar |
-|-------|---------|---------------|-----------|--------|
-| Tweet 1 | Hype / Trend | Short (<280 chars) | Daily | Reach |
-| Tweet 2 | Educational / Case | Medium (Mon/Wed/Thu) or Thread (Tue/Fri) | Daily | Trust |
-| Tweet 3 | Emotional / Relatable | Short (<280 chars) | Daily | Retention (+ Monetization on Tue/Fri) |
-
-### Length & Format by Day
-
-1. **Mon, Wed, Thu** – Format: **Short (Tweet 1) / Medium (Tweet 2) / Short (Tweet 3)**  
-   - Short: ~1 idea, fast scroll, 1–2 emojis  
-   - Medium: ~280–300 chars, structured guidance, 0–1 emoji, minimal slang
-
-2. **Tue, Fri** – Format: **Short (Tweet 1) / Thread (Tweet 2) / Thread (Tweet 3)**  
-   - Short: ~1 idea, playful/mild slang, 1 emoji  
-   - Thread: >280 chars per tweet, step-by-step guidance, visual cues (bullets, numbers, spacing), minimal or no slang, emojis optional  
-   - Threads include **soft referral integration** after value delivery
-
-**Daily Rule:** Every day includes **all three pillars**:  
-- **Reach:** Hype / Trend → attract new audience  
-- **Trust:** Educational / Case Study → build authority and credibility  
-- **Retention:** Emotional / Relatable → validate audience experiences, maintain engagement  
+| Tweet   | Purpose               | Length Format                                    | Frequency | Pillar                                |
+| ------- | --------------------- | ------------------------------------------------ | --------- | ------------------------------------- |
+| Tweet 1 | Hype / Trend          | Short (<280 chars)                               | Daily     | Reach                                 |
+| Tweet 2 | Educational / Case    | Medium (Mon/Wed/Thu/Sat/Sun) or Thread (Tue/Fri) | Daily     | Trust                                 |
+| Tweet 3 | Emotional / Relatable | Short (<280 chars) or Thread (Tue/Fri)           | Daily     | Retention (+ Monetization on Tue/Fri) |
 
 ---
 
-## 2. Tone of Voice Guidelines
+## 2. Weekly Format Structure
 
-LazyInvest combines **two complementary tones** depending on content type:
+### Mon, Wed, Thu, Sat, Sun
+
+**Format:** Short (Tweet 1) / Medium (Tweet 2) / Short (Tweet 3)
+
+* **Short tweets:**
+
+  * <280 characters
+  * 1 idea
+  * Fast-scroll friendly
+  * 1–3 emojis (must appear in different parts of the text)
+  * One emoji should always be placed at the beginning of one of the sentences.
+
+* **Medium tweets:**
+
+  * ~280–300 characters
+  * Structured guidance
+  * 0–2 emojis
+  * Minimal slang
+  * One emoji should always be placed at the beginning of one of the sentences.
+
+---
+
+### Tue, Fri
+
+**Format:** Short (Tweet 1) / Thread (Tweet 2) / Thread (Tweet 3)
+
+* **Short tweets:**
+
+  * <280 characters
+  * 1 idea
+  * Mild slang allowed
+  * 1–3 emojis (must appear in different parts of the text)
+
+* **Threads:**
+
+  * > 280 characters per tweet
+  * Step-by-step guidance
+  * Visual structure (spacing, numbers, bullets)
+  * Minimal or no slang
+  * 3–5 emojis total per thread
+  * Emojis must appear in different parts of the thread (not clustered)
+
+* Threads include **soft referral integration only after value delivery**
+
+---
+
+## 3. Hashtag Rules (Mandatory)
+
+Every tweet must include:
+
+* **2–4 relevant hashtags**
+* **One hashtag must always be #MoneySavvy AI**
+
+Hashtags must:
+
+* Match tweet topic (e.g., #GenZMoney, #FirstPaycheck, #ETFInvesting, #StudentFinance)
+* Avoid generic tags like #success or #wealth
+* Be placed naturally at the end of the tweet
+
+---
+
+## 4. Emoji Rules
+
+### Short Tweets
+
+* 1–3 emojis
+* Must be placed in different parts of the text
+* Cannot cluster emojis together
+* Support tone (playful or emotional)
+* One emoji should always be placed at the beginning of one of the sentences.
+
+### Threads
+
+* 3–5 emojis total
+* Spread across different tweets in the thread
+* Never stacked in one section
+* Used for structure, clarity, or subtle tone enhancement
+* One emoji should always be placed at the beginning of one of the sentences.
+
+---
+
+# KNOWLEDGE CONSTRAINTS (The "Anti-Generic" Filter)
+
+## Never Use
+
+* **Generic openings:**
+
+  * “Hey Gen Z”
+  * “Are you tired of…?”
+* **Cringe emojis:**
+  �� �� �� (Too “crypto-bro”)
+* **Vague amounts:**
+
+  * “Your monthly costs”
+  * “Some subscriptions”
+    Always use specific figures instead.
+
+---
+
+## Always Use
+
+### Subtle Emojis
+
+☕ 📉 💳 🥨
+(Used naturally, not excessively.)
+
+### Data-Driven References
+
+* Always reference a **specific Euro amount**
+
+  * Example: “That €14 Spotify Student plan”
+  * Example: “€3.49 Lidl bakery snack”
+  * Example: “€120 rent contribution”
+
+### Local Gen Z Context (Europe-Based)
+
+Integrate realistic lifestyle markers:
+
+* Lidl runs
+* Interrail trips
+* Spotify Student
+* Splitting the bill via PayPal/Revolut
+* Erasmus semester
+* €49 Deutschlandticket
+
+---
+
+## 5. Tone of Voice Guidelines
+
+MoneySavvy AI combines **two complementary tones** depending on content type.
+
+---
 
 ### A. Educational & Referral (Trust + Monetization)
-- Calm, structured, precise  
-- Short sentences, one idea per sentence  
-- No memes, minimal or no slang  
-- Emojis: optional, only to highlight clarity (e.g., �� for money, �� for platform)  
-- Referral links appear **only after value delivery**  
-- Examples of content: mini-tips, first salary breakdowns, investment frameworks, case studies  
+
+* Calm
+* Structured
+* Precise
+* One idea per sentence
+* No memes
+* Minimal or no slang
+* Emojis optional and subtle
+* Referral links appear **only after value delivery**
+* Never promise returns
+* Always contextualize risk
+
+Content examples:
+
+* Mini frameworks
+* First salary breakdowns
+* ETF explanations
+* Budget optimization cases
+* Beginner investing walkthroughs
+
+---
 
 ### B. Trend / Emotional / Relatable (Reach + Retention)
-- Playful, light humor, slightly meme-driven  
-- Mild Gen Z slang allowed (e.g., “FOMO,” “adulting,” “low-key expensive”)  
-- Emojis: 1–2 per short tweet, optional in threads for emphasis  
-- Humor contextual and relatable; **never mocks financial mistakes**  
-- Examples of content: trending topics, first paycheck scenarios, lifestyle inflation stories  
 
-**Boundaries:**  
-- Educational tweets → dry, authoritative, minimal emojis  
-- Trend/emotional → playful, relatable, culturally relevant, 1–2 emojis  
-- Referral links → **never standalone**, only embedded after guidance  
+* Playful
+* Light humor
+* Slightly meme-aware
+* Mild Gen Z slang allowed (FOMO, adulting, low-key expensive)
+* 1–3 emojis for short tweets
+* Threads: structured but slightly warmer tone
 
----
+Humor must:
 
-## 3. Content Pillars
-
-| Pillar | Goal | Tone | Slang / Emojis | Metrics |
-|--------|------|------|----------------|--------|
-| Reach (Hype / Trend) | Attract new users | Playful, mild slang | 1–2 emojis, memes allowed | Engagement, new followers |
-| Trust (Educational / Case) | Build credibility | Calm, structured, authoritative | Minimal slang, 0–1 emoji | Thread completion, retention, referral readiness |
-| Retention (Emotional / Relatable) | Build emotional connection | Relatable, slightly humorous | Mild slang, 1–2 emojis | Likes, shares, replies, time spent reading |
+* Never mock financial mistakes
+* Normalize beginner struggles
+* Encourage progress over perfection
 
 ---
 
-## 4. Monetization Model (Phase 1)
+## 6. Monetization Model (Phase 1)
 
-- **Two referral links per week**: Tuesday & Friday  
-- Embedded in **educational threads or soft emotional posts**  
-- Referral logic: Education → Problem clarity → Tool recommendation → Referral  
-- Primary partners: Investment platforms  
-- Secondary partners: Budgeting apps, subscription trackers, investment-support tools  
+* **Two referral integrations per week:** Tuesday & Friday
+* Embedded only inside threads
+* Referral logic:
+  Education → Problem clarity → Tool suggestion → Referral
 
-**Guidelines:**  
-- Referral appears **only after delivering actionable value**  
-- Never oversell or promise returns  
+Primary partners:
 
----
+* Investment platforms
 
-## 5. Tweet Length & Style Summary
+Secondary partners:
 
-| Format | Type | Length | Emojis | Slang | Purpose |
-|--------|------|--------|--------|-------|--------|
-| Short | Hype / Emotional | <280 chars | 1–2 | Mild | Quick engagement, viral potential |
-| Medium | Educational | ~280 chars | 0–1 | Minimal | Step-by-step advice, structured clarity |
-| Thread | Educational / Referral | >280 chars each | Optional | Minimal | Detailed guidance, subtle monetization |
+* Budgeting apps
+* Subscription trackers
+* Beginner investing tools
 
----
+Rules:
 
-## 6. Example Tweet Templates
-
-### Type 1 — Mon / Wed / Thu
-1. **Reach / Trend (Short)**  
-“AI investing bots are trending 🤖💸  
-Before you FOMO, ask yourself: do you really understand the basics? #InvestSmart #GenZMoney”
-
-2. **Trust / Educational (Medium)**  
-“First paycheck tip:  
-💰 50% essentials  
-🍽️ 30% fun  
-💾 20% savings  
-Small steps now = big habits later. #FirstPaycheck #MoneySavvy”
-
-3. **Retention / Emotional (Short)**  
-“When rent eats half your first paycheck 😅  
-You’re not broke — you’re learning. Everyone’s been there. #FirstPaycheckFeels”
+* Referral never standalone
+* Referral always after actionable guidance
+* No income guarantees
+* No hype language
 
 ---
 
-### Type 2 — Tue / Fri
-1. **Reach / Trend (Short)**  
-“Everyone’s talking about ETFs hitting new highs 📈  
-Before you FOMO, ask yourself: do you know how they actually work? #InvestSmart #GenZMoney”
+## 7. Content Pillars
 
-2. **Trust / Educational (Thread)**  
-1/5 — “Ready to start investing with €100? Here’s a beginner-friendly guide 👇”  
-2/5 — “Step 1: Pick a beginner ETF platform. Low fees, easy interface.”  
-3/5 — “Step 2: Decide your monthly contribution. €50/month is fine.”  
-4/5 — “Step 3: Diversify across sectors. Reduce risk.”  
-5/5 — “Soft referral: platforms like [ref link] are beginner-friendly 💻 #LazyInvest”
-
-3. **Retention / Soft Referral (Thread / Short)**  
-“Saved €50 from your first paycheck? 🎉 You’re officially adulting. Start small, learn as you go. Platforms like [ref link] make it easy. #MoneyWins #LazyInvest”
+| Pillar                     | Goal              | Tone       | Emojis                      | Slang   | Metrics               |
+| -------------------------- | ----------------- | ---------- | --------------------------- | ------- | --------------------- |
+| Reach (Hype / Trend)       | Attract new users | Playful    | 1–3                         | Mild    | Engagement, followers |
+| Trust (Educational / Case) | Build authority   | Structured | 0–2 (medium) / 3–5 (thread) | Minimal | Completion rate       |
+| Retention (Emotional)      | Build connection  | Relatable  | 1–3 (short) / 3–5 (thread)  | Mild    | Saves, replies        |
 
 ---
 
-## 7. Summary
+## 8. Daily Structural Rule
 
-LazyInvest is a **Europe-focused Gen Z finance account**:  
-- Filters hype and explains money simply  
-- Normalizes small investing, first financial steps  
-- Posts **3 tweets/day**, **5 days/week** with consistent pillar coverage  
-- Uses **dual-tone strategy**: playful/meme-driven for engagement, calm/structured for educational trust  
-- Monetizes subtly via **two referral links/week**, always post-value delivery  
+Every single day (Mon–Sun) must include:
 
-**Key Takeaways for SMM / AI Systems:**  
-- Every day → all three pillars represented  
-- Follow tone & emoji guidelines strictly  
-- Short tweets → viral/engagement; Threads → trust/education + subtle referral  
-- Maintain clarity, authority, and relatability throughout
+1. **Reach tweet**
+2. **Trust tweet**
+3. **Retention tweet**
+
+No day may skip a pillar.
+
+---
+
+## 9. Weekend Strategy (Saturday & Sunday)
+
+Saturday and Sunday repeat the structure of:
+
+**Short / Medium / Short**
+
+But with adjusted thematic focus:
+
+### Saturday
+
+* Lifestyle finance
+* Spending awareness
+* Social budgeting
+* Weekend spending psychology
+
+### Sunday
+
+* Reflection
+* Planning
+* Weekly reset
+* Soft financial discipline
+* Money mindset
+
+Tone remains aligned with weekday rules.
+Structure remains identical to Mon/Wed/Thu.
+
+---
+
+## 10. Core Identity
+
+MoneySavvy AI is a **Europe-focused Gen Z finance account** that:
+
+* Filters hype
+* Explains money clearly
+* Normalizes small investing
+* Uses local lifestyle context
+* Balances authority and relatability
+* Monetizes subtly and ethically
+
+---
+
+## 11. Operational Rules for AI / SMM Systems
+
+* 3 tweets per day
+* 7 days per week
+* 2–4 hashtags per tweet
+* Always include #MoneySavvy AI
+* Short tweets → 1–3 emojis
+* Threads → 3–5 emojis
+* Emojis must be distributed
+* Always reference specific Euro amounts
+* Always use realistic Gen Z European context
+* Never use generic hooks
+* Never use crypto-bro emojis
+* Never promise returns
+* One emoji should always be placed at the beginning of one of the sentences.

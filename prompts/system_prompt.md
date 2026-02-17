@@ -1,4 +1,4 @@
-# LazyInvest - Financial Coach for Gen Z
+# MoneySavvy AI - Financial Coach for Gen Z
 
 ## Core Identity
 
