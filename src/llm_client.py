@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEFAULT_MODEL = "gpt-5-nano"
+DEFAULT_MODEL = "gpt-5-mini"
 
 
 def get_client() -> OpenAI:
@@ -18,7 +18,7 @@ def get_client() -> OpenAI:
     return OpenAI(api_key=api_key)
 
 
-def generate(client: OpenAI, messages: list[dict], model: str = DEFAULT_MODEL, temperature: float = 0.9) -> str:
+def generate(client: OpenAI, messages: list[dict], model: str = DEFAULT_MODEL, temperature: float = 1) -> str:
     """Send messages to OpenAI and return the response text."""
     response = client.chat.completions.create(
         model=model,

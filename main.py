@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""MoneySavvy AI — Gen Z Financial Coach Content Engine"""
+"""LazyInvest — Gen Z Financial Coach Content Engine"""
 
 import os
 import shlex
@@ -48,7 +48,7 @@ def parse_generate_args(parts: list[str]) -> dict:
 
 
 def main():
-    print("\n=== MoneySavvy AI — Content Engine ===\n")
+    print("\n=== LazyInvest — Content Engine ===\n")
 
     # Initialize OpenAI client
     try:

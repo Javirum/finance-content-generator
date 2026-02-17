@@ -1,4 +1,4 @@
-"""MoneySavvy AI — Streamlit Web UI for the finance content generator."""
+"""LazyInvest — Streamlit Web UI for the finance content generator."""
 
 import os
 import tempfile
@@ -37,7 +37,7 @@ prompt_mgr: PromptManager = st.session_state.prompt_mgr
 
 # ── Page config ─────────────────────────────────────────────────────────────
 
-st.set_page_config(page_title="MoneySavvy AI", page_icon="💰", layout="wide")
+st.set_page_config(page_title="LazyInvest", page_icon="💰", layout="wide")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -45,7 +45,7 @@ st.set_page_config(page_title="MoneySavvy AI", page_icon="💰", layout="wide")
 # ══════════════════════════════════════════════════════════════════════════════
 
 with st.sidebar:
-    st.title("💰 MoneySavvy AI")
+    st.title("💰 LazyInvest")
 
     # ── Knowledge Base ──────────────────────────────────────────────────────
 
