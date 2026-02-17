@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import shutil
 import subprocess
@@ -60,22 +62,33 @@ class PromptManager:
         with open(path, "r", encoding="utf-8") as f:
             return f.read().strip()
 
-    def build_messages(self, kb_context: str, topic: str, style: str = "educational", template: str = "tweet_single") -> list[dict]:
+    def build_messages(self, kb_context: str, topic: str, style: str = "educational", template: str = "tweet_single", weekday: str | None = None, instructions: str | None = None) -> list[dict]:
         """Assemble the full message list for the OpenAI API.
 
         Returns a list of messages: [system, user].
+
+        When *weekday* is provided, the request section uses the weekday
+        instead of a style field.  When *instructions* is provided, it is
+        used as the instruction block instead of loading a template file.
         """
-        try:
-            tweet_template = self.load_template(template)
-        except FileNotFoundError:
-            tweet_template = ""
+        if instructions is not None:
+            tweet_template = instructions
+        else:
+            try:
+                tweet_template = self.load_template(template)
+            except FileNotFoundError:
+                tweet_template = ""
 
         user_content = ""
         if kb_context:
             user_content += f"## Knowledge Base Context\n\n{kb_context}\n\n---\n\n"
         if tweet_template:
             user_content += f"## Instructions\n\n{tweet_template}\n\n---\n\n"
-        user_content += f"## Request\n\nTopic: {topic}\nStyle: {style}\n"
+
+        if weekday is not None:
+            user_content += f"## Request\n\nTopic: {topic}\nDay: {weekday}\n\nGenerate all 3 tweets for this day following the brand guidelines above.\n"
+        else:
+            user_content += f"## Request\n\nTopic: {topic}\nStyle: {style}\n"
 
         return [
             {"role": "system", "content": self._system_prompt},

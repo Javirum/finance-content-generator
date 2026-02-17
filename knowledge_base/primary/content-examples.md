@@ -1,4 +1,4 @@
-# Content Examples — LazyInvest Voice
+# Content Examples — MoneySavvy AI Voice
 
 These are examples of the tone, style, and format we want. Use them as reference for generating new content.
 

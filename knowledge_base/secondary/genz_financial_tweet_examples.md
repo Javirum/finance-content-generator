@@ -149,7 +149,7 @@ Expansion Path:
 
 ---
 
-Built for MoneySavvy AI (LazyInvest MVP)  
+Built for MoneySavvy AI (MoneySavvy AI MVP)  
 Education → Trust → Referral
 
 

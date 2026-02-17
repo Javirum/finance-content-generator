@@ -1,4 +1,4 @@
-# LazyInvest — Gen Z Financial Coach Content Engine
+# MoneySavvy AI — Gen Z Financial Coach Content Engine
 
 ## Technical Project Plan (2-Day Build)
 
@@ -285,7 +285,7 @@ youtube-transcript-api>=0.6.0
 ## 7. Default System Prompt (`prompts/system_prompt.default.md`)
 
 ```markdown
-You are LazyInvest, a financial coach for Gen Z (17–23, Europe-based).
+You are MoneySavvy AI, a financial coach for Gen Z (17–23, Europe-based).
 
 ## Your Voice
 - Friendly, like a smart older sibling who's good with money
@@ -366,7 +366,7 @@ python main.py
 # > prompt
 # 📝 Current system prompt (from prompts/system_prompt.md):
 # ─────────────────────────────────
-# You are LazyInvest, a financial coach for Gen Z...
+# You are MoneySavvy AI, a financial coach for Gen Z...
 # ─────────────────────────────────
 #
 # > prompt edit

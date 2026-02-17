@@ -6,6 +6,10 @@ from src.prompts import PromptManager
 from src.llm_client import generate as llm_generate
 
 OUTPUT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "output", "generated")
+BRAND_GUIDELINES_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)),
+    "knowledge_base", "primary", "brand-guidelines.md",
+)
 
 
 def generate_tweet(client, kb: KnowledgeBase, prompt_mgr: PromptManager, topic: str, style: str = "educational") -> str:
@@ -45,6 +49,21 @@ def generate_thread(client, kb: KnowledgeBase, prompt_mgr: PromptManager, topic:
         "role": "user",
         "content": f"Generate exactly {count} tweets in this thread.",
     })
+    return llm_generate(client, messages)
+
+
+def generate_daily_content(client, kb: KnowledgeBase, prompt_mgr: PromptManager, topic: str, weekday: str) -> str:
+    """Generate all 3 tweets for a given weekday using the brand guidelines."""
+    with open(BRAND_GUIDELINES_PATH, "r", encoding="utf-8") as f:
+        brand_guidelines = f.read().strip()
+
+    kb_context = kb.get_context()
+    messages = prompt_mgr.build_messages(
+        kb_context=kb_context,
+        topic=topic,
+        weekday=weekday,
+        instructions=brand_guidelines,
+    )
     return llm_generate(client, messages)
 
 

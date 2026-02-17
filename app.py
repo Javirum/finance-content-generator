@@ -1,4 +1,4 @@
-"""MoneySavy AI — Streamlit Web UI for the finance content generator."""
+"""MoneySavvy AI — Streamlit Web UI for the finance content generator."""
 
 import os
 
@@ -39,14 +39,14 @@ prompt_mgr: PromptManager = st.session_state.prompt_mgr
 
 # ── Page config ─────────────────────────────────────────────────────────────
 
-st.set_page_config(page_title="MoneySavy AI", page_icon="💰", layout="wide")
+st.set_page_config(page_title="MoneySavvy AI", page_icon="💰", layout="wide")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # MAIN AREA
 # ══════════════════════════════════════════════════════════════════════════════
 
-st.title("💰 MoneySavy AI")
+st.title("💰 MoneySavvy AI")
 st.header("🐦 Content Generator")
 
 col_topic, col_day = st.columns([3, 2])
